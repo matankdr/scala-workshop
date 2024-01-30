@@ -1,14 +1,33 @@
 # Scala Workshop
 
-## Introduction
-In this exercise you will implement a basic HTTP request/response flow using STTP client.
-You will send http requests to a local instance of HttpBin.
-In each case, you are required to send a request and parse the response(s).
+<details>
+<summary> Setup Environment </summary>
 
-## Running local instance of HttpBin
+### Install [sdkman](https://sdkman.io/install)
+```shell
+curl -s "https://get.sdkman.io" | bash
+```
+
+### Install Java, Scala & SBT
+From a new shell, run the following command:
+```shell
+sdk install java 17.0.9-oracle
+sdk install scala 2.12.16
+sdk install sbt 1.9.8
+```
+
+### Setup Wix Environment
+- Install Wix environment as mentioned in [here](https://bo.wix.com/wix-docs/server-guild/get-started/scala-onboarding/nothing-to-prod/1.-setup-scala-development-environment)
+- Setup Intellij plugins as mentioned in [here](https://github.com/wix-private/wix-intellij-plugin/blob/master/docs/plugin-getting-started.md)
+
+### Verify Docker is working
+Run the following command:
 ```shell
 docker run --rm -p 8080:80 kennethreitz/httpbin
 ```
+And browse to http://localhost:8080.
+You should see the home page of HttpBin.
+</details>
 
 ## Exercises
 
