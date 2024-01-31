@@ -70,3 +70,4 @@ project/**/metals.sbt
 .bsp
 
 .DS_Store
+.idea
