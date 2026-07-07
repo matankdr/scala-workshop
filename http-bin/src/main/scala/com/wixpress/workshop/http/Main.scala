@@ -1,26 +1,23 @@
 package com.wixpress.workshop.http
 
-import sttp.client3._
+import com.wixpress.workshop.utils.HttpClient
 
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 
 object Main extends App {
-  val backend = HttpClientFutureBackend()
 
   val query = "http language:scala"
   val sort: Option[String] = None
 
-  val request = basicRequest.get(
-    uri"https://api.github.com/search/repositories?q=$query&sort=$sort")
-
   val future = for {
-    response      <- request.send(backend)
-    contentLength  = response.header("Content-Length")
+    response      <- HttpClient.get(s"https://api.github.com/search/repositories?q=$query&sort=$sort")
+    contentLength  = response.headers
+      .collectFirst { case (key, value) if key.toLowerCase == "content-length" => value }
     body           = response.body
   } yield {
-    println(s"contentLength = ${contentLength}")
+    println(s"contentLength = ${contentLength.getOrElse("none")}")
     println(s"body = ${body}")
   }
 
