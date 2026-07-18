@@ -17,7 +17,7 @@ object Main extends App {
       .collectFirst { case (key, value) if key.toLowerCase == "content-length" => value }
     body           = response.body
   } yield {
-    println(s"contentLength = ${contentLength.getOrElse("none")}")
+    println(s"content-length = ${contentLength.getOrElse("none")}")
     println(s"body = ${body}")
   }
 
