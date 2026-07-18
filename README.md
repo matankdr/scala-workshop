@@ -46,7 +46,6 @@ You should see the home page of HttpBin.
 
 ### Redirect
 - Send a GET request to `http://localhost:8080/redirect-to?url=http%3A%2F%2Flocalhost%3A8080%2Fuuid&status_code=200`
-- Mark the request to not follow redirects (`requets.followRedirects(false)`)
 - Parse the response
 - Send another request according to the value in `Location` header
 -
@@ -57,7 +56,6 @@ You should see the home page of HttpBin.
 
 ### N redirects
 - Send a GET request to `"http://localhost:8080/absolute-redirect/{N}"`
-- Mark the request to not follow redirects (`requets.followRedirects(false)`)
 - Parse the response
 - Send another request according to the value in `Location` header
 - Repeat until status code is 200
