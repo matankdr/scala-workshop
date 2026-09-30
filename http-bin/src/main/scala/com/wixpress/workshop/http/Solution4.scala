@@ -1,26 +1,21 @@
 package com.wixpress.workshop.http
 
-import com.wixpress.workshop.utils.{EitherOps, JsonUtil}
-import sttp.client3._
+import com.wixpress.workshop.utils.HttpClient.Response
+import com.wixpress.workshop.utils.{HttpClient, JsonUtil, OptionOps}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-object Solution4 extends App with EitherOps {
+object Solution4 extends App with OptionOps with HeaderOps {
 
-  val backend = HttpClientFutureBackend()
-
-  val request = basicRequest.get(uri"http://localhost:8080/stream/3")
-
-  val futurePayloads = for {
-    response <- request.send(backend)
-    body     <- response.body.toFuture
-    lines    <- Future.sequence(body.split("\n").toList.map(Future.successful))
-    payloads  = lines.map(JsonUtil.fromJson[Payload])
+  val result = for {
+    Response(_, _, Some(body)) <- HttpClient.get("http://localhost:8080/stream/3")
+    lines                       = body.split("\n").toList
+    payloads                    = lines.map(JsonUtil.fromJson[Payload])
   } yield payloads
 
-  val future = futurePayloads.map(_.mkString("\n")).map(println)
+  val future = result.map(_.mkString("\n")).map(println)
 
   Await.result(future, 10.seconds)
 }

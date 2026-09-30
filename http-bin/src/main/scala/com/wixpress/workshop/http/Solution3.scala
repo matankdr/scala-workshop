@@ -1,43 +1,33 @@
 package com.wixpress.workshop.http
 
-import com.wixpress.workshop.utils.EitherOps
-import sttp.client3._
-import sttp.model.StatusCode
+import com.wixpress.workshop.utils.HttpClient.Response
+import com.wixpress.workshop.utils.{HttpClient, OptionOps}
 
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 
-object Solution3 extends App with EitherOps {
-  val backend = HttpClientFutureBackend()
+object Solution3 extends App with OptionOps with HeaderOps {
 
-  def sendRequest(url: String): Future[Either[String, String]] = {
-    val request = basicRequest.get(uri"$url").followRedirects(false)
+  def sendRequest(url: String) = {
+    println(s"sending request to $url")
 
     for {
-      response <- request.send(backend)
-      _         = println(s"sent request to $url")
-      body     <- handleResponse(response)
+      response <- HttpClient.get(url)
+      body <- handleRedirect(response)
     } yield body
   }
 
-  def handleResponse(response: Response[Either[String, String]]) = {
-    (response.code, response.headers.find(_.is("location"))) match {
-      case (StatusCode.Found, Some(location)) =>
-        sendRequest(location.value)
-
-      case (StatusCode.Ok, _) =>
-        Future.successful(response.body)
-
-      case _ =>
-        Future.failed(new RuntimeException("Unexpected response"))
+  def handleRedirect(response: HttpClient.Response): Future[String] = {
+    (response.status, response.getHeader("location")) match {
+      case (302, Some(location)) =>
+        sendRequest(location)
+      case (200, _) =>
+        response.body.toFuture
     }
   }
 
-  val result = for {
-    response <- sendRequest("http://localhost:8080/absolute-redirect/10")
-    body     <- response.toFuture
-  } yield println(body)
+  val result = sendRequest("http://localhost:8080/absolute-redirect/10").map(println)
 
   Await.result(result, 10.seconds)
 }
